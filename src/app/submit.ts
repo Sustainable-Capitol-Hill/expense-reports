@@ -142,8 +142,9 @@ ${Object.entries(row)
   );
 
   await transport.sendMail({
-    from: "expenses@sustainablecapitolhill.org",
-    to: basicInfo.email, // TODO: add ccs
+    from: "expense-reports@sustainablecapitolhill.org",
+    to: basicInfo.email,
+    cc: ["expense-reports@sustainablecapitolhill.org"],
     subject: "Your Expense Report Submission",
     text: emailBody,
     attachments,
