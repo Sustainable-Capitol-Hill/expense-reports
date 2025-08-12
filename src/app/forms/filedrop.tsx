@@ -1,6 +1,6 @@
 import { Stack, Text, Title } from "@mantine/core";
-import { IconPhoto, IconUpload, IconX } from "@tabler/icons-react";
 import { Dropzone, IMAGE_MIME_TYPE } from "@mantine/dropzone";
+import { IconPhoto, IconUpload, IconX } from "@tabler/icons-react";
 
 import { PartialBasicInfo } from "./types";
 

@@ -12,7 +12,7 @@ import {
 import { DateInput } from "@mantine/dates";
 import { IconCheck, IconX } from "@tabler/icons-react";
 import { useState } from "react";
-import z, { set } from "zod";
+import z from "zod";
 
 import { submitExpense } from "../submit";
 import { FileDrop } from "./filedrop";
@@ -167,9 +167,8 @@ export function ExpenseForm() {
       <Button
         mt="md"
         mb="md"
-        onClick={async () => {
-          await handleSubmit();
-        }}
+        // eslint-disable-next-line @typescript-eslint/no-misused-promises
+        onClick={handleSubmit}
         disabled={isSubmitting}
         loading={isSubmitting}
       >
