@@ -1,5 +1,5 @@
 import { Stack, Text, Title } from "@mantine/core";
-import { Dropzone, IMAGE_MIME_TYPE } from "@mantine/dropzone";
+import { Dropzone, IMAGE_MIME_TYPE, PDF_MIME_TYPE } from "@mantine/dropzone";
 import { IconPhoto, IconUpload, IconX } from "@tabler/icons-react";
 
 import { PartialBasicInfo } from "./types";
@@ -37,13 +37,13 @@ export function FileDrop({
           alert("Sorry, you can't upload that type of file.");
         }}
         maxSize={5 * 1024 ** 2}
-        accept={IMAGE_MIME_TYPE}
+        accept={[...IMAGE_MIME_TYPE, ...PDF_MIME_TYPE]}
       >
         <Stack
           gap="xs"
           justify="center"
           align="center"
-          mih={220}
+          mih={180}
           style={{ pointerEvents: "none" }}
         >
           <Dropzone.Accept>

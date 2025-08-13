@@ -2,11 +2,8 @@
 import "dotenv/config";
 
 import dayjs from "dayjs";
-import { JWT } from "google-auth-library";
 import { GoogleSpreadsheet } from "google-spreadsheet";
-import { google } from "googleapis";
 import { humanId } from "human-id";
-import * as nodemailer from "nodemailer";
 import { Readable } from "stream";
 import z from "zod";
 
@@ -14,55 +11,37 @@ import {
   BasicInfoValidator,
   ReimbursementMethodValidator,
 } from "./forms/types";
-
-const transport = nodemailer.createTransport({
-  host: "smtp.mailgun.org",
-  port: 587,
-  auth: {
-    user: process.env.MAILGUN_SMTP_USERNAME,
-    pass: process.env.MAILGUN_SMTP_PASSWORD,
-  },
-});
-
-const serviceAccountAuth = new JWT({
-  email: process.env.GCLOUD_CLIENT_EMAIL,
-  key: process.env.GCLOUD_PRIVATE_KEY,
-  scopes: [
-    "https://www.googleapis.com/auth/spreadsheets",
-    "https://www.googleapis.com/auth/drive",
-  ],
-  subject: process.env.GCLOUD_IMPERSONATE_EMAIL,
-});
-
-if (!process.env.GOOGLE_SPREADSHEET_ID) {
-  throw new Error("Missing GOOGLE_SPREADSHEET_ID");
-}
-
-const folderId = process.env.GOOGLE_DRIVE_RECEIPTS_FOLDER_ID;
-if (!folderId) {
-  throw new Error("Missing GOOGLE_DRIVE_RECEIPTS_FOLDER_ID");
-}
+import settings, {
+  gdriveClient,
+  googleSearchAccountAuth,
+  mailTransport,
+} from "./settings";
 
 const doc = new GoogleSpreadsheet(
-  process.env.GOOGLE_SPREADSHEET_ID,
-  serviceAccountAuth
+  settings.GOOGLE_SPREADSHEET_ID,
+  googleSearchAccountAuth
 );
-
-// Configure Google Drive API with the same service account
-const drive = google.drive({ version: "v3", auth: serviceAccountAuth });
 
 function formatReimbursementInfo(
   reimbursement: z.infer<typeof ReimbursementMethodValidator>
 ): Record<string, string> {
-  if (reimbursement.reimbursementMethod === "paypal") {
-    return {
-      "PayPal Email": reimbursement.paypalEmail,
-    };
-  } else {
-    return {
-      "Check Address": reimbursement.checkAddress,
-      "Check Phone": reimbursement.checkPhone,
-    };
+  switch (reimbursement.reimbursementMethod) {
+    case "paypal":
+      return {
+        "PayPal Email": reimbursement.paypalEmail,
+      };
+    case "check":
+      return {
+        "Check Address": reimbursement.checkAddress,
+        "Check Phone": reimbursement.checkPhone,
+      };
+    case "direct_deposit":
+      return {
+        "Routing Number": reimbursement.routingNumber,
+        "Account Number": reimbursement.accountNumber,
+      };
+    case "already_known":
+      return {};
   }
 }
 
@@ -101,13 +80,13 @@ async function uploadReceiptsToDrive(
       const fileExtension = file.name.split(".").pop();
       const fileMetadata = {
         name: `${id}.${fileExtension}`,
-        parents: [folderId!],
+        parents: [settings.GOOGLE_DRIVE_RECEIPTS_FOLDER_ID],
       };
       const media = {
         mimeType: file.type,
         body: Readable.from(Buffer.from(await file.arrayBuffer())),
       };
-      const response = await drive.files.create({
+      const response = await gdriveClient.files.create({
         requestBody: fileMetadata,
         media,
         supportsAllDrives: true,
@@ -131,6 +110,11 @@ async function sendConfirmationEmail(
   const emailBody = `Thanks for submitting your expense report!
 
 ${Object.entries(row)
+  .map(([key, value]) =>
+    key.includes("Account Number")
+      ? [key, `********${value.substring(value.length - 4, value.length)}`]
+      : [key, value]
+  )
   .map(([key, value]) => `${key}: ${value}`)
   .join("\n")}`;
 
@@ -141,7 +125,7 @@ ${Object.entries(row)
     }))
   );
 
-  await transport.sendMail({
+  await mailTransport.sendMail({
     from: "expense-reports@sustainablecapitolhill.org",
     to: basicInfo.email,
     cc: ["expense-reports@sustainablecapitolhill.org"],

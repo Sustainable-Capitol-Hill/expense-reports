@@ -11,6 +11,9 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
+      <head>
+        <title>CHTL Reimbursement Request</title>
+      </head>
       <body>
         <MantineProvider>{children}</MantineProvider>
       </body>

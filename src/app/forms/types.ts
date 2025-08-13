@@ -7,7 +7,9 @@ export const BasicInfoValidator = z.object({
   itemPrice: z.number().min(1),
   purchaseDate: z.date(),
   receipts: z
-    .array(z.file().mime(["image/jpeg", "image/png", "image/gif"]))
+    .array(
+      z.file().mime(["image/jpeg", "image/png", "image/gif", "application/pdf"])
+    )
     .min(1),
 });
 
@@ -22,6 +24,14 @@ export const ReimbursementMethodValidator = z.discriminatedUnion(
       reimbursementMethod: z.literal("check"),
       checkAddress: z.string(),
       checkPhone: z.string(),
+    }),
+    z.object({
+      reimbursementMethod: z.literal("direct_deposit"),
+      routingNumber: z.string(),
+      accountNumber: z.string().min(4),
+    }),
+    z.object({
+      reimbursementMethod: z.literal("already_known"),
     }),
   ]
 );

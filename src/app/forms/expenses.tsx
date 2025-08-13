@@ -2,6 +2,7 @@
 import {
   Alert,
   Button,
+  Grid,
   Group,
   Radio,
   Stack,
@@ -111,41 +112,45 @@ export function ExpenseForm() {
           value={info.email ?? ""}
           onChange={(e) => setInfo({ ...info, email: e.target.value })}
         />
-        <Group align="flex-start" grow>
-          <Stack>
-            <Title order={3}>Item Info</Title>
-            <DateInput
-              label="Purchase Date"
-              maxDate={new Date()}
-              firstDayOfWeek={0}
-              weekendDays={[]} // Prevent weekends from showing in red
-              value={info.purchaseDate ?? ""}
-              onChange={(date) =>
-                setInfo((info) =>
-                  date ? { ...info, purchaseDate: new Date(date) } : info
-                )
-              }
-            />
-            <TextInput
-              label="Item Description"
-              placeholder="What did you buy, and what was it for?"
-              value={info.itemDescription ?? ""}
-              onChange={(e) =>
-                setInfo({ ...info, itemDescription: e.target.value })
-              }
-            />
-            <TextInput
-              leftSection={"$"}
-              label="Item Price"
-              type="number"
-              value={info.itemPrice ?? ""}
-              onChange={(e) =>
-                setInfo({ ...info, itemPrice: Number(e.target.value) })
-              }
-            />
-          </Stack>
-          <FileDrop basicInfo={info} setBasicInfo={setInfo} />
-        </Group>
+        <Grid>
+          <Grid.Col span={{ base: 12, xs: 6 }}>
+            <Stack>
+              <Title order={3}>Item Info</Title>
+              <DateInput
+                label="Purchase Date"
+                maxDate={new Date()}
+                firstDayOfWeek={0}
+                weekendDays={[]} // Prevent weekends from showing in red
+                value={info.purchaseDate ?? ""}
+                onChange={(date) =>
+                  setInfo((info) =>
+                    date ? { ...info, purchaseDate: new Date(date) } : info
+                  )
+                }
+              />
+              <TextInput
+                label="Item Description"
+                placeholder="What did you buy, and what was it for?"
+                value={info.itemDescription ?? ""}
+                onChange={(e) =>
+                  setInfo({ ...info, itemDescription: e.target.value })
+                }
+              />
+              <TextInput
+                leftSection={"$"}
+                label="Item Price"
+                type="number"
+                value={info.itemPrice ?? ""}
+                onChange={(e) =>
+                  setInfo({ ...info, itemPrice: Number(e.target.value) })
+                }
+              />
+            </Stack>
+          </Grid.Col>
+          <Grid.Col span={{ base: 12, xs: 6 }}>
+            <FileDrop basicInfo={info} setBasicInfo={setInfo} />
+          </Grid.Col>
+        </Grid>
         <Title order={3}>Reimbursement Method</Title>
         <Group>
           <Radio
@@ -157,6 +162,20 @@ export function ExpenseForm() {
             label="Check"
             checked={reimbursement.reimbursementMethod === "check"}
             onChange={() => setReimbursement({ reimbursementMethod: "check" })}
+          />
+          <Radio
+            label="Direct Deposit"
+            checked={reimbursement.reimbursementMethod === "direct_deposit"}
+            onChange={() =>
+              setReimbursement({ reimbursementMethod: "direct_deposit" })
+            }
+          />
+          <Radio
+            label="Already Known"
+            checked={reimbursement.reimbursementMethod === "already_known"}
+            onChange={() =>
+              setReimbursement({ reimbursementMethod: "already_known" })
+            }
           />
         </Group>
       </Stack>
