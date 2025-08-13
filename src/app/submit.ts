@@ -22,6 +22,8 @@ const doc = new GoogleSpreadsheet(
   googleSearchAccountAuth
 );
 
+const accountNumberTitle = "Account Number";
+
 function formatReimbursementInfo(
   reimbursement: z.infer<typeof ReimbursementMethodValidator>
 ): Record<string, string> {
@@ -38,7 +40,7 @@ function formatReimbursementInfo(
     case "direct_deposit":
       return {
         "Routing Number": reimbursement.routingNumber,
-        "Account Number": reimbursement.accountNumber,
+        [accountNumberTitle]: reimbursement.accountNumber,
       };
     case "already_known":
       return {};
@@ -111,7 +113,7 @@ async function sendConfirmationEmail(
 
 ${Object.entries(row)
   .map(([key, value]) =>
-    key.includes("Account Number")
+    key === accountNumberTitle
       ? [key, `********${value.substring(value.length - 4, value.length)}`]
       : [key, value]
   )
