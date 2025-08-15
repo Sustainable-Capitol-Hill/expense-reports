@@ -141,6 +141,9 @@ export async function submitExpense(
   basicInfo: z.infer<typeof BasicInfoValidator>,
   reimbursement: z.infer<typeof ReimbursementMethodValidator>
 ) {
+  await BasicInfoValidator.parseAsync(basicInfo);
+  await ReimbursementMethodValidator.parseAsync(reimbursement);
+
   // Load spreadsheet and get the first sheet
   await doc.loadInfo();
   const sheet = doc.sheetsByIndex[0];
