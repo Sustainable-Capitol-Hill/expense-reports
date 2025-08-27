@@ -145,7 +145,7 @@ ${Object.entries(row)
     from: "expense-reports@sustainablecapitolhill.org",
     to: basicInfo.email,
     cc: ["expense-reports@sustainablecapitolhill.org"],
-    subject: "Your Expense Report Submission",
+    subject: "Your Expense Report Submission at " + new Date().toLocaleString(),
     text: emailBody,
     attachments,
   });
