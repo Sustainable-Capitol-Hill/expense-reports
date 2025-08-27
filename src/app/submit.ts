@@ -3,7 +3,6 @@ import "dotenv/config";
 
 import dayjs from "dayjs";
 import { GoogleSpreadsheet } from "google-spreadsheet";
-import { humanId } from "human-id";
 import { Readable } from "stream";
 import z from "zod";
 
@@ -64,14 +63,29 @@ function createSpreadsheetRow(
   };
 }
 
-function generateUniqueFileIds(receipts: File[]) {
-  return receipts.map((receipt) => ({
-    id: humanId({
-      separator: "-",
-      capitalize: false,
-    }),
+function generateUniqueFileIds(receipts: File[], userName: string) {
+  const submissionId: string = generateUniqueSubmissionId(userName);
+
+  return receipts.map((receipt: File, i: number) => ({
+    id: `${submissionId}_${i.toString()}`,
     file: receipt,
   }));
+}
+
+function generateUniqueSubmissionId(username: string): string {
+  const cleanedName = username.replaceAll(/[^\w\d]/, "_");
+  const now = new Date();
+  const pad = (n: number) => n.toString().padStart(2, "0");
+
+  const year = now.getUTCFullYear();
+  const month = pad(now.getUTCMonth() + 1); // months are 0-based
+  const day = pad(now.getUTCDate());
+  const hours = pad(now.getUTCHours());
+  const minutes = pad(now.getUTCMinutes());
+  const seconds = pad(now.getUTCSeconds());
+
+  // username_YYYY-MM-DD_HH:MM:SS
+  return `${cleanedName}_${year}-${month}-${day}_${hours}:${minutes}:${seconds}`;
 }
 
 async function uploadReceiptsToDrive(
@@ -149,7 +163,10 @@ export async function submitExpense(
   const sheet = doc.sheetsByIndex[0];
 
   // Generate unique IDs for receipt files
-  const uniqueIdFiles = generateUniqueFileIds(basicInfo.receipts);
+  const uniqueIdFiles = generateUniqueFileIds(
+    basicInfo.receipts,
+    basicInfo.name
+  );
 
   // Upload receipts to Google Drive and get links
   const receiptLinks = await uploadReceiptsToDrive(uniqueIdFiles);
