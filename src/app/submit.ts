@@ -73,7 +73,7 @@ function generateUniqueFileIds(receipts: File[], userName: string) {
 }
 
 function generateUniqueSubmissionId(username: string): string {
-  const cleanedName = username.replaceAll(/[^\w\d]/, "_");
+  const cleanedName = username.replaceAll(/[^\w\d]/g, "_");
   const now = new Date();
   const pad = (n: number) => n.toString().padStart(2, "0");
 
