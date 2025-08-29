@@ -66,6 +66,7 @@ export function ExpenseForm() {
     try {
       await submitExpense(parsedInfo.data!, parsedReimbursement.data!);
     } catch (error) {
+      setIsSubmitting(false);
       setErrors([String(error)]);
       return;
     }
@@ -124,7 +125,7 @@ export function ExpenseForm() {
                 value={info.purchaseDate ?? ""}
                 onChange={(date) =>
                   setInfo((info) =>
-                    date ? { ...info, purchaseDate: new Date(date) } : info
+                    date ? { ...info, purchaseDate: new Date(date) } : info,
                   )
                 }
               />

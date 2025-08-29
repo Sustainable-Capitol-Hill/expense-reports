@@ -8,7 +8,9 @@ export const BasicInfoValidator = z.object({
   purchaseDate: z.date(),
   receipts: z
     .array(
-      z.file().mime(["image/jpeg", "image/png", "image/gif", "application/pdf"])
+      z
+        .file()
+        .mime(["image/jpeg", "image/png", "image/gif", "application/pdf"]),
     )
     .min(1),
 });
@@ -33,7 +35,7 @@ export const ReimbursementMethodValidator = z.discriminatedUnion(
     z.object({
       reimbursementMethod: z.literal("already_known"),
     }),
-  ]
+  ],
 );
 
 export type PartialReimbursementMethod = Partial<
