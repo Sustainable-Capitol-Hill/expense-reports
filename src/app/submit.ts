@@ -34,7 +34,6 @@ function formatReimbursementInfo(
     case "check":
       return {
         "Check Address": reimbursement.checkAddress,
-        "Check Phone": reimbursement.checkPhone,
       };
     case "direct_deposit":
       return {
@@ -55,6 +54,7 @@ function createSpreadsheetRow(
   return {
     Name: basicInfo.name,
     Email: basicInfo.email,
+    Phone: basicInfo.phone,
     "Item Description": basicInfo.itemDescription,
     "Item Price": basicInfo.itemPrice.toString(),
     "Purchase Date": dayjs(basicInfo.purchaseDate).format("YYYY-MM-DD"),

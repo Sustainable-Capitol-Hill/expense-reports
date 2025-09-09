@@ -31,33 +31,17 @@ export function ReimbursementMethodForm({
         );
       case "check":
         return (
-          <Grid>
-            <Grid.Col span={halfWidthSpan}>
-              <TextInput
-                label="Your Address"
-                placeholder="So we know where to send the check"
-                value={reimbursement.checkAddress ?? ""}
-                onChange={(e) =>
-                  setReimbursement({
-                    ...reimbursement,
-                    checkAddress: e.target.value,
-                  })
-                }
-              />
-            </Grid.Col>
-            <Grid.Col span={halfWidthSpan}>
-              <TextInput
-                label="Phone Number"
-                value={reimbursement.checkPhone ?? ""}
-                onChange={(e) =>
-                  setReimbursement({
-                    ...reimbursement,
-                    checkPhone: e.target.value,
-                  })
-                }
-              />
-            </Grid.Col>
-          </Grid>
+          <TextInput
+            label="Your Address"
+            placeholder="So we know where to send the check"
+            value={reimbursement.checkAddress ?? ""}
+            onChange={(e) =>
+              setReimbursement({
+                ...reimbursement,
+                checkAddress: e.target.value,
+              })
+            }
+          />
         );
       case "direct_deposit":
         return (

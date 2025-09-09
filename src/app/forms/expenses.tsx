@@ -12,8 +12,8 @@ import {
 } from "@mantine/core";
 import { DateInput } from "@mantine/dates";
 import { IconCheck, IconX } from "@tabler/icons-react";
+import dayjs from "dayjs";
 import { useState } from "react";
-import z from "zod";
 
 import { submitExpense } from "../submit";
 import { FileDrop } from "./filedrop";
@@ -42,15 +42,18 @@ export function ExpenseForm() {
       ReimbursementMethodValidator.safeParse(reimbursement);
 
     let hasError = false;
-    const errors = [];
+    let errors: string[] = [];
 
     if (!parsedInfo.success) {
-      errors.push(z.prettifyError(parsedInfo.error));
+      errors = [...errors, ...parsedInfo.error.issues.map((i) => i.message)];
       hasError = true;
     }
 
     if (!parsedReimbursement.success) {
-      errors.push(z.prettifyError(parsedReimbursement.error));
+      errors = [
+        ...errors,
+        ...parsedReimbursement.error.issues.map((i) => i.message),
+      ];
       hasError = true;
     }
 
@@ -113,6 +116,11 @@ export function ExpenseForm() {
           value={info.email ?? ""}
           onChange={(e) => setInfo({ ...info, email: e.target.value })}
         />
+        <TextInput
+          label="Phone Number"
+          value={info.phone ?? ""}
+          onChange={(e) => setInfo({ ...info, phone: e.target.value })}
+        />
         <Grid>
           <Grid.Col span={{ base: 12, xs: 6 }}>
             <Stack>
@@ -125,7 +133,9 @@ export function ExpenseForm() {
                 value={info.purchaseDate ?? ""}
                 onChange={(date) =>
                   setInfo((info) =>
-                    date ? { ...info, purchaseDate: new Date(date) } : info,
+                    date
+                      ? { ...info, purchaseDate: dayjs(date).toDate() } // use dayjs to ensure that we respect timezone
+                      : info
                   )
                 }
               />
